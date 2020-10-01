@@ -1,24 +1,28 @@
 import requests
 import json
+import unittest
+
+from GetCommits import getCommits
+
+# This code implements the unit test functionality
+# https://docs.python.org/3/library/unittest.html has a nice description of the framework
 
 
-def getCommits():
-    gitHubID = input('Please enter GitHub ID:')
-    ghRepo = input('Please enter Repository:')
-    response = requests.get(f'https://api.github.com/repos/{gitHubID}/{ghRepo}/commits')
-
-    sCode = response.status_code
-    commits = len(response.json())
-
-    if sCode >= 200 and sCode < 300:
-        print(gitHubID, ' Number of commits:', commits)
-    elif sCode >= 300 and sCode < 400:
-        print('Redirect neccessary. Response:', response)
-    elif sCode >= 400 and sCode < 500:
-        print('Invalid input. Use a valid GitHub ID and Repository. Response:', response)
-    elif sCode >= 500:
-        print('Server Error. Response:', response)
-    else:
-        print('Failed. Response:', response)
-
-getCommits()
+class GetDataTest(unittest.TestCase):
+    # define multiple sets of tests that account for the different status codes that can occur with API requests
+    
+    #tests for success ie. valid GitHub ID 
+    def testSuccess(self): 
+        response = requests.get(f'https://api.github.com/repos/richkempinski/hellogitworld/commits')
+        commits = len(response.json())
+        self.assertEqual(getCommits('richkempinski', 'hellogitworld'),'hellogitworld Number of commits: {}'.format(commits))  
+    
+   
+    #tests for user error ie. invalid GitHub ID
+    def testFailure2(self): 
+        self.assertEqual(getCommits('richkempinski','abcdefgzyxwvut'),'Invalid input. Use a valid GitHub ID and Repository.')
+    
+        
+if __name__ == '__main__':
+    print('Running unit tests')
+    unittest.main()
